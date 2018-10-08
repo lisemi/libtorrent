@@ -4,12 +4,18 @@ project(libtorrent
 	DESCRIPTION "Bittorrent library"
 	VERSION 1.2.0
 )
+set(CPACK_SOURCE_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${VERSION}")
 set (SOVERSION "10")
 
 list(APPEND CMAKE_MODULE_PATH ${libtorrent_SOURCE_DIR}/cmake/Modules)
 include(FeatureSummary)
 include(GNUInstallDirs)
 include(GeneratePkgConfig)
+include(CPack)
+
+add_custom_target(dist COMMAND ${CMAKE_MAKE_PROGRAM} package_source)
+
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(libtorrent_include_files
 	add_torrent_params
@@ -543,14 +549,6 @@ set_target_properties(torrent-rasterbar
 		SOVERSION ${SOVERSION}
 )
 
-if (cxx_std_14 IN_LIST CMAKE_CXX_COMPILE_FEATURES)
-	target_compile_features(torrent-rasterbar PUBLIC cxx_std_14)
-	message(STATUS "Building in C++14 mode")
-else()
-	target_compile_features(torrent-rasterbar PUBLIC cxx_std_11)
-	message(STATUS "Building in C++11 mode")
-endif()
-
 target_include_directories(torrent-rasterbar PUBLIC
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
@@ -565,6 +563,7 @@ target_compile_definitions(torrent-rasterbar
 		BOOST_EXCEPTION_DISABLE
 		BOOST_ASIO_ENABLE_CANCELIO
 		BOOST_ASIO_HAS_STD_CHRONO
+		BOOST_NO_DEPRECATED
 )
 
 target_link_libraries(torrent-rasterbar
@@ -581,8 +580,9 @@ if (WIN32)
 	)
 
 	target_compile_definitions(torrent-rasterbar
-		PUBLIC
+		PRIVATE
 			_WIN32_WINNT=0x0600 # target Windows Vista or later
+		PUBLIC
 			WIN32_LEAN_AND_MEAN # prevent winsock1 to be included
 	)
 
@@ -712,8 +712,8 @@ else()
 endif()
 
 # Boost
-find_public_dependency(Boost REQUIRED COMPONENTS system)
-target_include_directories(torrent-rasterbar PUBLIC ${Boost_INCLUDE_DIRS})
+find_package(Boost REQUIRED COMPONENTS system)
+target_include_directories(torrent-rasterbar PUBLIC ${Boost_INCLUDE_DIR})
 target_link_libraries(torrent-rasterbar PUBLIC ${Boost_SYSTEM_LIBRARY})
 
 if (exceptions)
