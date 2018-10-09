@@ -88,6 +88,13 @@ target_include_directories(python-libtorrent
 		${PYTHON_INCLUDE_DIRS}
 )
 
+if (WIN32)
+	target_compile_definitions(python-libtorrent
+		PRIVATE
+			_WIN32_WINNT=0x0600 # target Windows Vista or later
+	)
+endif()
+
 string(TOUPPER "${boost-python-module-name}" boost_python_module_name_uppercase)
 target_link_libraries(python-libtorrent
 	PRIVATE
