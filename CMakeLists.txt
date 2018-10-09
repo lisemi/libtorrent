@@ -552,6 +552,10 @@ target_include_directories(torrent-rasterbar PUBLIC
 	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
+# make the CXX_STANDARD property public to ensure it makes it into the pkg-config file
+get_target_property(_std torrent-rasterbar CXX_STANDARD)
+target_compile_features(torrent-rasterbar PUBLIC cxx_std_${_std})
+
 target_compile_definitions(torrent-rasterbar
 	PUBLIC
 		$<$<CONFIG:Debug>:TORRENT_USE_ASSERTS>
