@@ -4,7 +4,7 @@ project(libtorrent
 	DESCRIPTION "Bittorrent library"
 	VERSION 1.2.0
 )
-set(CPACK_SOURCE_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${VERSION}")
+set(CPACK_SOURCE_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${PROJECT_VERSION}")
 set (SOVERSION "10")
 
 list(APPEND CMAKE_MODULE_PATH ${libtorrent_SOURCE_DIR}/cmake/Modules)
@@ -14,8 +14,6 @@ include(GeneratePkgConfig)
 include(CPack)
 
 add_custom_target(dist COMMAND ${CMAKE_MAKE_PROGRAM} package_source)
-
-set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(libtorrent_include_files
 	add_torrent_params
@@ -712,8 +710,8 @@ else()
 endif()
 
 # Boost
-find_package(Boost REQUIRED COMPONENTS system)
-target_include_directories(torrent-rasterbar PUBLIC ${Boost_INCLUDE_DIR})
+find_public_dependency(Boost REQUIRED COMPONENTS system)
+target_include_directories(torrent-rasterbar PUBLIC ${Boost_INCLUDE_DIRS})
 target_link_libraries(torrent-rasterbar PUBLIC ${Boost_SYSTEM_LIBRARY})
 
 if (exceptions)
